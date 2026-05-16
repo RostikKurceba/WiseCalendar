@@ -2,21 +2,56 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Wise Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WiseCalendar</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
 
-    <h1>Wise Calendar</h1>
+    <div class="top-panel">
 
-    <input type="text" id="eventInput"
-           placeholder="Наприклад: Лекція завтра о 9:40">
+        <input
+                type="text"
+                id="eventInput"
+                placeholder="Введіть подію (наприклад: Лекція завтра о 9:40)"
+        >
 
-    <button onclick="addEvent()">Додати</button>
+        <button onclick="addEvent()">
+            Додати
+        </button>
 
-    <div id="events"></div>
+    </div>
+
+    <div class="calendar-header">
+
+        <button class="arrow-btn" onclick="previousMonth()">
+            &#10094;
+        </button>
+
+        <h2 id="monthYear"></h2>
+
+        <button class="arrow-btn" onclick="nextMonth()">
+            &#10095;
+        </button>
+
+    </div>
+
+    <div class="weekdays">
+
+        <div>Пн</div>
+        <div>Вт</div>
+        <div>Ср</div>
+        <div>Чт</div>
+        <div>Пт</div>
+        <div>Сб</div>
+        <div>Нд</div>
+
+    </div>
+
+    <div id="calendar" class="calendar-grid"></div>
 
 </div>
 
