@@ -36,7 +36,7 @@ body {
 
 #eventInput {
 
-    flex: 1;
+    flex: 0.8;
 
     padding: 18px;
 
@@ -183,4 +183,28 @@ body {
     padding: 4px;
 
     cursor: pointer;
+}
+
+.logout-btn {
+
+    width: 140px !important;
+
+    background: #ea4335 !important;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 15px;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+}
+
+.logout-btn:hover {
+
+    background: #d93025 !important;
 }

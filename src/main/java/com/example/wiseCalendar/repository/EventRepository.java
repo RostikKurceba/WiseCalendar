@@ -1,7 +1,13 @@
 package com.example.wiseCalendar.repository;
 
 import com.example.wiseCalendar.model.Event;
+import com.example.wiseCalendar.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface EventRepository extends JpaRepository<Event, Long> {
+import java.util.List;
+
+public interface EventRepository
+        extends JpaRepository<Event, Long> {
+
+    List<Event> findByUser(User user);
 }

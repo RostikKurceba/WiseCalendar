@@ -1,3 +1,14 @@
+alert("script.js працює");
+
+const userId =
+    localStorage.getItem("userId");
+
+if(!userId) {
+
+    window.location.href =
+        "login.html";
+}
+
 const API = "http://localhost:8080/events";
 
 let currentDate = new Date();
@@ -188,4 +199,14 @@ async function deleteEvent(id) {
     loadEvents();
 }
 
-loadEvents();
+window.onload = () => {
+
+    loadEvents();
+};
+
+function logout() {
+
+    localStorage.removeItem("userId");
+
+    window.location.href = "login.html";
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Реєстрація</title>
+
+    <link rel="stylesheet" href="auth.css">
+
+</head>
+<body>
+
+<div class="auth-box">
+
+    <h1>Реєстрація</h1>
+
+    <input type="email"
+           id="registerEmail"
+           placeholder="Email">
+
+    <input type="password"
+           id="registerPassword"
+           placeholder="Пароль">
+
+    <input type="password"
+           id="confirmPassword"
+           placeholder="Підтвердити пароль">
+
+    <button onclick="register()">
+        Створити акаунт
+    </button>
+
+    <p>
+        Вже є акаунт?
+    </p>
+
+    <button onclick="goToLogin()">
+        Вхід
+    </button>
+
+</div>
+
+<script src="auth.js"></script>
+
+</body>
+</html>
