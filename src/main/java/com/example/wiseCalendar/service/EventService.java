@@ -5,6 +5,11 @@ import com.example.wiseCalendar.model.User;
 import com.example.wiseCalendar.repository.EventRepository;
 import com.example.wiseCalendar.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import java.time.Month;
+import java.util.HashMap;
+import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +31,23 @@ public class EventService {
         this.userRepository = userRepository;
     }
 
+    private final Map<String, Integer> months = new HashMap<>();
+
+    {
+        months.put("січня", 1);
+        months.put("лютого", 2);
+        months.put("березня", 3);
+        months.put("квітня", 4);
+        months.put("травня", 5);
+        months.put("червня", 6);
+        months.put("липня", 7);
+        months.put("серпня", 8);
+        months.put("вересня", 9);
+        months.put("жовтня", 10);
+        months.put("листопада", 11);
+        months.put("грудня", 12);
+    }
+
     public Event createEventFromText(String text, Long userId) {
 
         Event event = new Event();
@@ -35,6 +57,59 @@ public class EventService {
         String lowerText = text.toLowerCase();
 
         LocalDate date = LocalDate.now();
+
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        Pattern fullDatePattern =
+                Pattern.compile(
+                        "(\\d{1,2})\\s+" +
+                                "(січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня)" +
+                                "(?:\\s+(\\d{4})\\s+року)?"
+                );
+
+        Matcher fullDateMatcher =
+                fullDatePattern.matcher(lowerText);
+
+        if(fullDateMatcher.find()) {
+
+            int day =
+                    Integer.parseInt(
+                            fullDateMatcher.group(1)
+                    );
+
+            String monthName =
+                    fullDateMatcher.group(2);
+
+            int month =
+                    months.get(monthName);
+
+            int year;
+
+            // Якщо рік вказаний
+
+            if(fullDateMatcher.group(3) != null) {
+
+                year =
+                        Integer.parseInt(
+                                fullDateMatcher.group(3)
+                        );
+            }
+
+            // Якщо рік НЕ вказаний
+
+            else {
+
+                year =
+                        LocalDate.now().getYear();
+            }
+
+            date =
+                    LocalDate.of(
+                            year,
+                            month,
+                            day
+                    );
+        }
 
         // СЬОГОДНІ
 
@@ -162,6 +237,33 @@ public class EventService {
             date = LocalDate.now().plusYears(years);
         }
 
+        Pattern hoursPattern =
+                Pattern.compile("через\\s+(\\d+)\\s+год");
+
+        Matcher hoursMatcher =
+                hoursPattern.matcher(lowerText);
+
+        if(hoursMatcher.find()) {
+
+            int hours =
+                    Integer.parseInt(
+                            hoursMatcher.group(1)
+                    );
+
+            dateTime =
+                    LocalDateTime.now().plusHours(hours);
+
+            date =
+                    dateTime.toLocalDate();
+
+            event.setTime(
+                    dateTime.toLocalTime()
+                            .withSecond(0)
+                            .withNano(0)
+                            .toString()
+            );
+        }
+
         event.setDate(
                 date.format(
                         DateTimeFormatter.ofPattern("dd.MM.yyyy")
@@ -170,21 +272,24 @@ public class EventService {
 
         // ЧАС
 
-        String time = "00:00";
+        if(event.getTime() == null) {
 
-        String[] words = text.split(" ");
+            String time = "00:00";
 
-        for(String word : words) {
+            String[] words = text.split(" ");
 
-            if(word.matches("\\d{1,2}:\\d{2}")) {
+            for(String word : words) {
 
-                time = word;
+                if(word.matches("\\d{1,2}:\\d{2}")) {
 
-                break;
+                    time = word;
+
+                    break;
+                }
             }
-        }
 
-        event.setTime(time);
+            event.setTime(time);
+        }
 
         User user =
                 userRepository.findById(userId)

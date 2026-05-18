@@ -173,6 +173,25 @@ async function addEvent() {
     const input =
         document.getElementById("eventInput");
 
+const text =
+    input.value.toLowerCase();
+
+const hoursMatch =
+    text.match(/через\s+(-?\d+)\s+год/);
+
+if(hoursMatch) {
+
+    const hours =
+        parseInt(hoursMatch[1]);
+
+    if(hours <= 0) {
+
+        alert("Ввід не коректних даних");
+
+        return;
+    }
+}
+
     if(input.value.trim() === "") {
         return;
     }
