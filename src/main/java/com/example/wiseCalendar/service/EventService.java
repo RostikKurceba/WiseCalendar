@@ -52,9 +52,44 @@ public class EventService {
 
         Event event = new Event();
 
-        event.setTitle(text);
-
         String lowerText = text.toLowerCase();
+
+        String cleanTitle = lowerText;
+
+        // Видалення часу типу 12:30
+        cleanTitle =
+                cleanTitle.replaceAll("\\b\\d{1,2}:\\d{2}\\b", "");
+
+        // Видалення самостійної букви "о"
+        cleanTitle =
+                cleanTitle.replaceAll("\\sо\\s", " ");
+
+        // Видалення дат типу 12 травня 2026 року
+        cleanTitle =
+                cleanTitle.replaceAll(
+                        "\\d{1,2}\\s+(січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня)(\\s+\\d{4}\\s+року)?",
+                        ""
+                );
+
+        // Видалення конструкцій "через n ..."
+        cleanTitle =
+                cleanTitle.replaceAll(
+                        "через\\s+\\d+\\s+(годин|години|год|хвилин|хв|днів|дні|день|тижнів|тижні|тиждень|місяців|місяці|місяць|років|роки|рік)",
+                        ""
+                );
+
+        // Видалення слів сьогодні/завтра/післязавтра
+        cleanTitle =
+                cleanTitle.replaceAll(
+                        "\\b(сьогодні|завтра|післязавтра)\\b",
+                        ""
+                );
+
+        // Прибираємо зайві пробіли
+        cleanTitle =
+                cleanTitle.replaceAll("\\s+", " ").trim();
+
+        event.setTitle(cleanTitle);
 
         LocalDate date = LocalDate.now();
 
