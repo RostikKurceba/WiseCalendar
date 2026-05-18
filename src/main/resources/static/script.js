@@ -1,13 +1,13 @@
-alert("script.js працює");
-
-const userId =
-    localStorage.getItem("userId");
-
-if(!userId) {
-
-    window.location.href =
-        "login.html";
-}
+//alert("script.js працює");
+//
+//const userId =
+//    localStorage.getItem("userId");
+//
+//if(!userId) {
+//
+//    window.location.href =
+//        "login.html";
+//}
 
 const API = "http://localhost:8080/events";
 
@@ -19,7 +19,11 @@ async function loadEvents() {
 
     try {
 
-        const response = await fetch(API);
+        const userId =
+            localStorage.getItem("userId");
+
+        const response =
+            await fetch(`${API}/${userId}`);
 
         events = await response.json();
 
@@ -181,7 +185,12 @@ async function addEvent() {
             "Content-Type": "application/json"
         },
 
-        body: JSON.stringify(input.value)
+        body: JSON.stringify({
+
+            text: input.value,
+
+            userId: localStorage.getItem("userId")
+        })
     });
 
     input.value = "";

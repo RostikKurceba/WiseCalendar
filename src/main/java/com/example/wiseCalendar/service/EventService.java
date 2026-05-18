@@ -1,7 +1,9 @@
 package com.example.wiseCalendar.service;
 
 import com.example.wiseCalendar.model.Event;
+import com.example.wiseCalendar.model.User;
 import com.example.wiseCalendar.repository.EventRepository;
+import com.example.wiseCalendar.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -13,12 +15,18 @@ import java.util.regex.Pattern;
 public class EventService {
 
     private final EventRepository repository;
+    private final UserRepository userRepository;
 
-    public EventService(EventRepository repository) {
+    public EventService(
+            EventRepository repository,
+            UserRepository userRepository
+    ) {
+
         this.repository = repository;
+        this.userRepository = userRepository;
     }
 
-    public Event createEventFromText(String text) {
+    public Event createEventFromText(String text, Long userId) {
 
         Event event = new Event();
 
@@ -177,6 +185,12 @@ public class EventService {
         }
 
         event.setTime(time);
+
+        User user =
+                userRepository.findById(userId)
+                        .orElse(null);
+
+        event.setUser(user);
 
         return repository.save(event);
     }
