@@ -61,11 +61,11 @@ public class EventService {
         {
             weekdays.put("понеділок", 1);
             weekdays.put("вівторок", 2);
-            weekdays.put("середа", 3);
+            weekdays.put("середу", 3);
             weekdays.put("четвер", 4);
-            weekdays.put("п'ятниця", 5);
-            weekdays.put("субота", 6);
-            weekdays.put("неділя", 7);
+            weekdays.put("п'ятницю", 5);
+            weekdays.put("суботу", 6);
+            weekdays.put("неділю", 7);
         }
 
         // Видалення часу типу 12:30
@@ -75,6 +75,14 @@ public class EventService {
         // Видалення самостійної букви "о"
         cleanTitle =
                 cleanTitle.replaceAll("\\sо\\s", " ");
+
+        //видалення букви в
+        cleanTitle = cleanTitle.replaceAll(
+                "\\s+(в|у)\\s+(сьогодні|завтра|післязавтра|понеділок|вівторок|середу|четвер|п'ятницю|суботу|неділю|" +
+                        "січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня|" +
+                        "\\d{4})",
+                " $2"
+        );
 
         // Видалення дат типу 12 травня 2026 року
         cleanTitle =
@@ -91,12 +99,15 @@ public class EventService {
                 );
 
         // Видалення слів типу сьогодні/завтра/післязавтра
-        cleanTitle = cleanTitle.replaceAll("\\b(сьогодні|завтра|післязавтра)\\b", "");
+        cleanTitle = cleanTitle.replaceAll(
+                "\\s*(сьогодні|завтра|післязавтра)\\s*",
+                " "
+        );
 
         // Видалення днів тижня
         cleanTitle = cleanTitle.replaceAll(
-                "\\b(понеділок|вівторок|середа|четвер|п'ятниця|субота|неділя)\\b",
-                ""
+                "\\s*(понеділок|вівторок|середу|четвер|п'ятницю|суботу|неділю)\\s*",
+                " "
         );
 
         // Прибираємо зайві пробіли
@@ -115,7 +126,6 @@ public class EventService {
             int targetDay = entry.getValue();
 
             if (lowerText.contains(dayName)) {
-
                 int today = LocalDate.now().getDayOfWeek().getValue();
 
                 int diff = targetDay - today;
@@ -285,7 +295,6 @@ public class EventService {
 
         Pattern monthsPattern =
                 Pattern.compile("через\\s+(\\d+)\\s+міс");
-
         Matcher monthsMatcher =
                 monthsPattern.matcher(lowerText);
 
