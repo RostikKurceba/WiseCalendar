@@ -56,6 +56,18 @@ public class EventService {
 
         String cleanTitle = lowerText;
 
+        final Map<String, Integer> weekdays = new HashMap<>();
+
+        {
+            weekdays.put("понеділок", 1);
+            weekdays.put("вівторок", 2);
+            weekdays.put("середа", 3);
+            weekdays.put("четвер", 4);
+            weekdays.put("п'ятниця", 5);
+            weekdays.put("субота", 6);
+            weekdays.put("неділя", 7);
+        }
+
         // Видалення часу типу 12:30
         cleanTitle =
                 cleanTitle.replaceAll("\\b\\d{1,2}:\\d{2}\\b", "");
@@ -78,12 +90,14 @@ public class EventService {
                         ""
                 );
 
-        // Видалення слів сьогодні/завтра/післязавтра
-        cleanTitle =
-                cleanTitle.replaceAll(
-                        "\\b(сьогодні|завтра|післязавтра)\\b",
-                        ""
-                );
+        // Видалення слів типу сьогодні/завтра/післязавтра
+        cleanTitle = cleanTitle.replaceAll("\\b(сьогодні|завтра|післязавтра)\\b", "");
+
+        // Видалення днів тижня
+        cleanTitle = cleanTitle.replaceAll(
+                "\\b(понеділок|вівторок|середа|четвер|п'ятниця|субота|неділя)\\b",
+                ""
+        );
 
         // Прибираємо зайві пробіли
         cleanTitle =
@@ -94,6 +108,33 @@ public class EventService {
         LocalDate date = LocalDate.now();
 
         LocalDateTime dateTime = LocalDateTime.now();
+
+        for (Map.Entry<String, Integer> entry : weekdays.entrySet()) {
+
+            String dayName = entry.getKey();
+            int targetDay = entry.getValue();
+
+            if (lowerText.contains(dayName)) {
+
+                int today = LocalDate.now().getDayOfWeek().getValue();
+
+                int diff = targetDay - today;
+
+                // якщо день вже пройшов → переносимо на наступний тиждень
+                if (diff < 0) {
+                    diff += 7;
+                }
+
+                // якщо сьогодні цей день, але ти хочеш "на найближчий майбутній"
+                if (diff == 0) {
+                    diff = 7;
+                }
+
+                date = LocalDate.now().plusDays(diff);
+
+                break;
+            }
+        }
 
         Pattern fullDatePattern =
                 Pattern.compile(
