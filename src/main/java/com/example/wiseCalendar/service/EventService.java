@@ -264,6 +264,33 @@ public class EventService {
             );
         }
 
+        Pattern minutesPattern =
+                Pattern.compile("через\\s+(\\d+)\\s+хв");
+
+        Matcher minutesMatcher =
+                minutesPattern.matcher(lowerText);
+
+        if(minutesMatcher.find()) {
+
+            int minutes =
+                    Integer.parseInt(
+                            minutesMatcher.group(1)
+                    );
+
+            dateTime =
+                    LocalDateTime.now().plusMinutes(minutes);
+
+            date =
+                    dateTime.toLocalDate();
+
+            event.setTime(
+                    dateTime.toLocalTime()
+                            .withSecond(0)
+                            .withNano(0)
+                            .toString()
+            );
+        }
+
         event.setDate(
                 date.format(
                         DateTimeFormatter.ofPattern("dd.MM.yyyy")

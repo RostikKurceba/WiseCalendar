@@ -173,8 +173,10 @@ async function addEvent() {
     const input =
         document.getElementById("eventInput");
 
-const text =
-    input.value.toLowerCase();
+    const text =
+        input.value.toLowerCase().trim();
+
+    // Перевірка фрази "через n годин"
 
 const hoursMatch =
     text.match(/через\s+(-?\d+)\s+год/);
@@ -192,7 +194,23 @@ if(hoursMatch) {
     }
 }
 
-    if(input.value.trim() === "") {
+const minutesMatch =
+    text.match(/через\s+(-?\d+)\s+хв/);
+
+if(minutesMatch) {
+
+    const minutes =
+        parseInt(minutesMatch[1]);
+
+    if(minutes <= 0) {
+
+        alert("Ввід не коректних даних");
+
+        return;
+    }
+}
+
+    if(text === "") {
         return;
     }
 
