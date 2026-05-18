@@ -176,6 +176,24 @@ async function addEvent() {
     const text =
         input.value.toLowerCase().trim();
 
+// Перевірка часу формату HH:MM
+const timeRegex = /(\d{1,2}):(\d{2})/g;
+
+let timeMatch;
+
+while ((timeMatch = timeRegex.exec(text)) !== null) {
+
+    const hours = parseInt(timeMatch[1]);
+    const minutes = parseInt(timeMatch[2]);
+
+    if (hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
+
+        alert("не коректний ввід часу");
+
+        return; // блокує додавання події
+    }
+}
+
     // Перевірка фрази "через n годин"
 
 const hoursMatch =
