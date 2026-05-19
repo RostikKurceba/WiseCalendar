@@ -94,7 +94,7 @@ public class EventService {
         // Видалення конструкцій "через n ..."
         cleanTitle =
                 cleanTitle.replaceAll(
-                        "через\\s+\\d+\\s+(годин|години|год|хвилин|хв|днів|дні|день|тижнів|тижні|тиждень|місяців|місяці|місяць|років|роки|рік)",
+                        "через(\\s+\\d+)?\\s+(години|годину|годин|год|хвилину|хвилини|хвилин|хв|днів|дні|день|тижнів|тижні|тиждень|місяців|місяці|місяць|років|роки|рік)",
                         ""
                 );
 
@@ -322,6 +322,26 @@ public class EventService {
             date = LocalDate.now().plusYears(years);
         }
 
+        // ЧЕРЕЗ ГОДИНУ
+
+        if(lowerText.contains("через годину")) {
+
+            dateTime =
+                    LocalDateTime.now().plusHours(1);
+
+            date =
+                    dateTime.toLocalDate();
+
+            event.setTime(
+                    dateTime.toLocalTime()
+                            .withSecond(0)
+                            .withNano(0)
+                            .toString()
+            );
+        }
+
+        // ЧЕРЕЗ N ГОДИН
+
         Pattern hoursPattern =
                 Pattern.compile("через\\s+(\\d+)\\s+год");
 
@@ -348,6 +368,8 @@ public class EventService {
                             .toString()
             );
         }
+
+        // ЧЕРЕЗ N ХВИЛИН
 
         Pattern minutesPattern =
                 Pattern.compile("через\\s+(\\d+)\\s+хв");
