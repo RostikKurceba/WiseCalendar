@@ -176,20 +176,47 @@ async function addEvent() {
     const text =
         input.value.toLowerCase().trim();
 
-// СТРОГА ПЕРЕВІРКА ЧАСУ HH:MM (без сміття)
+// СТРОГА ПЕРЕВІРКА ЧАСУ HH:MM
 
 const strictTimeRegex =
-    /\b(2[0-3]|1[0-9]|0?[0-9]):([0-5][0-9])\b/g;
+    /\b(2[0-3]|1[0-9]|0?[0-9]):([0-5][0-9])\b/;
 
-// шукаємо ВСІ можливі "псевдо-часи"
-const allTimeMatches =
-    text.match(/\b\d+\s*[:.,\-]\s*\d+\b/g);
+// шукаємо будь-які конструкції типу 8?00
+const suspiciousTimePattern =
+    /\b\d{1,2}\s*[^0-9\s]\s*\d{2}\b/g;
 
-if(allTimeMatches) {
+const suspiciousMatches =
+    text.match(suspiciousTimePattern);
 
-    for(const badTime of allTimeMatches) {
+if(suspiciousMatches) {
 
-        if(!strictTimeRegex.test(badTime.replace(/\s+/g, ""))) {
+    for(const match of suspiciousMatches) {
+
+        // якщо це НЕ нормальний формат HH:MM
+        if(!strictTimeRegex.test(match.replace(/\s+/g, ""))) {
+
+            alert("не коректний ввід даних");
+
+            return;
+        }
+    }
+}
+
+// перевірка неправильного часу типу 8000, 1234
+
+const invalidCompactTime =
+    /\b\d{3,4}\b/g;
+
+const compactMatches =
+    text.match(invalidCompactTime);
+
+if(compactMatches) {
+
+    for(const match of compactMatches) {
+
+        // якщо це НЕ нормальний формат часу HH:MM
+        // і число схоже на спробу написати час
+        if(!/\b\d{1,2}:\d{2}\b/.test(match)) {
 
             alert("не коректний ввід даних");
 
