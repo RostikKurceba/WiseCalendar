@@ -194,35 +194,92 @@ while ((timeMatch = timeRegex.exec(text)) !== null) {
     }
 }
 
-    // Перевірка фрази "через n годин"
+// Перевірка конструкцій "через n ..."
 
-const hoursMatch =
-    text.match(/через\s+(-?\d+)\s+год/);
+const invalidTimePattern =
+    /через\s+([^\s]+)\s+(хв|хвилин|хвилини|хвилину|год|годин|години|годину|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
 
-if(hoursMatch) {
+const invalidMatch =
+    text.match(invalidTimePattern);
 
-    const hours =
-        parseInt(hoursMatch[1]);
+if(invalidMatch) {
 
-    if(hours <= 0) {
+    const value =
+        invalidMatch[1];
 
-        alert("Ввід не коректних даних");
+    // якщо не число
+    if(!/^\d+$/.test(value)) {
+
+        alert("не коректний ввід часу");
+
+        return;
+    }
+
+    // якщо число <= 0
+    if(parseInt(value) <= 0) {
+
+        alert("не коректний ввід часу");
 
         return;
     }
 }
 
-const minutesMatch =
-    text.match(/через\s+(-?\d+)\s+хв/);
+// Повна перевірка конструкцій "через n ..."
 
-if(minutesMatch) {
+if(text.includes("через")) {
 
-    const minutes =
-        parseInt(minutesMatch[1]);
+    // правильний формат
+    const validPattern =
+        /через\s+\d+\s+(хв|хвилину|хвилини|хвилин|год|годину|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
 
-    if(minutes <= 0) {
+    // шукаємо будь-яку конструкцію "через ..."
+    const throughPattern =
+        /через\s+([^\s]+)\s+([^\s]+)/;
 
-        alert("Ввід не коректних даних");
+    const throughMatch =
+        text.match(throughPattern);
+
+    // якщо конструкція є
+    if(throughMatch) {
+
+        const value =
+            throughMatch[1];
+
+        const unit =
+            throughMatch[2];
+
+        // перевірка числа
+        if(!/^\d+$/.test(value)) {
+
+            alert("не коректний ввід даних");
+
+            return;
+        }
+
+        // число <= 0
+        if(parseInt(value) <= 0) {
+
+            alert("не коректний ввід даних");
+
+            return;
+        }
+
+        // перевірка одиниці часу
+        const strictPattern =
+            /^через\s+\d+\s+(хв|хвилину|хвилини|хвилин|год|годину|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)$/;
+
+        if(!strictPattern.test(throughMatch[0])) {
+
+            alert("не коректний ввід даних");
+
+            return;
+        }
+    }
+
+    // якщо написано просто "через"
+    else {
+
+        alert("не коректний ввід даних");
 
         return;
     }
@@ -231,6 +288,32 @@ if(minutesMatch) {
     if(text === "") {
         return;
     }
+
+if(text.includes("через") && !text.match(/через\s+\d+\s+/)) {
+
+    alert("не коректний ввід часу");
+
+    return;
+}
+
+// Забороняємо конструкції типу:
+// "лекція 6 годин"
+// "арпопоо 5 днів"
+// якщо перед числом немає слова "через"
+
+const invalidTimeWithoutThrough =
+     /(^|\s)(?!через\s)\S+\s+\d+\s+(хв|хвилина|хвилини|хвилин|год|година|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
+
+ if(
+     invalidTimeWithoutThrough.test(text)
+     &&
+     !/через\s+\d+\s+(хв|хвилина|хвилини|хвилин|год|година|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/.test(text)
+ ) {
+
+     alert("не коректний ввід даних");
+
+     return;
+ }
 
     await fetch(API, {
 
