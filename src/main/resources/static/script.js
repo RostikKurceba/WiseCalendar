@@ -176,108 +176,81 @@ async function addEvent() {
     const text =
         input.value.toLowerCase().trim();
 
-// Перевірка часу формату HH:MM
-const timeRegex = /(\d{1,2}):(\d{2})/g;
+// СТРОГА ПЕРЕВІРКА ЧАСУ HH:MM (без сміття)
+
+const strictTimeRegex =
+    /\b(2[0-3]|1[0-9]|0?[0-9]):([0-5][0-9])\b/g;
+
+// шукаємо ВСІ можливі "псевдо-часи"
+const allTimeMatches =
+    text.match(/\b\d+\s*[:.,\-]\s*\d+\b/g);
+
+if(allTimeMatches) {
+
+    for(const badTime of allTimeMatches) {
+
+        if(!strictTimeRegex.test(badTime.replace(/\s+/g, ""))) {
+
+            alert("не коректний ввід даних");
+
+            return;
+        }
+    }
+}
+
+// додатково: якщо є ":" але формат неправильний
+const brokenTime =
+    /\d+\s*[:.,\-]\s*\d+/.test(text);
+
+if(brokenTime && !/\b\d{1,2}:\d{2}\b/.test(text)) {
+
+    alert("не коректний ввід даних");
+
+    return;
+}
+
+// порожній ввід
+
+if(text === "") {
+
+    alert("не коректний ввід даних");
+
+    return;
+}
+
+// допустимі конструкції часу
+
+const validTimeUnits =
+    "(хв|хвилина|хвилини|хвилин|год|година|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)";
+
+// допустимі конструкції дат
+
+const validDateWords =
+    "(сьогодні|завтра|післязавтра|понеділок|вівторок|середу|четвер|п'ятницю|суботу|неділю|січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня)";
+
+// перевірка часу HH:MM
+
+const timeRegex = /\b(\d{1,2}):(\d{2})\b/g;
 
 let timeMatch;
 
-while ((timeMatch = timeRegex.exec(text)) !== null) {
+while((timeMatch = timeRegex.exec(text)) !== null) {
 
-    const hours = parseInt(timeMatch[1]);
-    const minutes = parseInt(timeMatch[2]);
+    const hours =
+        parseInt(timeMatch[1]);
 
-    if (hours < 0 || hours > 24 || minutes < 0 || minutes > 59) {
+    const minutes =
+        parseInt(timeMatch[2]);
 
-        alert("не коректний ввід часу");
-
-        return; // блокує додавання події
-    }
-}
-
-// Перевірка конструкцій "через n ..."
-
-const invalidTimePattern =
-    /через\s+([^\s]+)\s+(хв|хвилин|хвилини|хвилину|год|годин|години|годину|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
-
-const invalidMatch =
-    text.match(invalidTimePattern);
-
-if(invalidMatch) {
-
-    const value =
-        invalidMatch[1];
-
-    // якщо не число
-    if(!/^\d+$/.test(value)) {
-
-        alert("не коректний ввід часу");
-
-        return;
-    }
-
-    // якщо число <= 0
-    if(parseInt(value) <= 0) {
-
-        alert("не коректний ввід часу");
-
-        return;
-    }
-}
-
-// Повна перевірка конструкцій "через n ..."
-
-if(text.includes("через")) {
-
-    // правильний формат
-    const validPattern =
-        /через\s+\d+\s+(хв|хвилину|хвилини|хвилин|год|годину|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
-
-    // шукаємо будь-яку конструкцію "через ..."
-    const throughPattern =
-        /через\s+([^\s]+)\s+([^\s]+)/;
-
-    const throughMatch =
-        text.match(throughPattern);
-
-    // якщо конструкція є
-    if(throughMatch) {
-
-        const value =
-            throughMatch[1];
-
-        const unit =
-            throughMatch[2];
-
-        // перевірка числа
-        if(!/^\d+$/.test(value)) {
-
-            alert("не коректний ввід даних");
-
-            return;
-        }
-
-        // число <= 0
-        if(parseInt(value) <= 0) {
-
-            alert("не коректний ввід даних");
-
-            return;
-        }
-
-        // перевірка одиниці часу
-        const strictPattern =
-            /^через\s+\d+\s+(хв|хвилину|хвилини|хвилин|год|годину|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)$/;
-
-        if(!strictPattern.test(throughMatch[0])) {
-
-            alert("не коректний ввід даних");
-
-            return;
-        }
-    }
-
-    // якщо написано просто "через"
-    else {
+    if(
+        hours < 0
+        ||
+        hours > 23
+        ||
+        minutes < 0
+        ||
+        minutes > 59
+    ) {
 
         alert("не коректний ввід даних");
 
@@ -285,36 +258,87 @@ if(text.includes("через")) {
     }
 }
 
-    if(text === "") {
+// перевірка "через n ..."
+
+const throughPattern =
+    new RegExp(`через\\s+(\\d+)\\s+${validTimeUnits}`);
+
+if(text.includes("через")) {
+
+    if(!throughPattern.test(text)) {
+
+        alert("не коректний ввід даних");
+
         return;
     }
 
-if(text.includes("через") && !text.match(/через\s+\d+\s+/)) {
+    const throughMatch =
+        text.match(/через\s+(\d+)/);
 
-    alert("не коректний ввід часу");
+    if(
+        throughMatch
+        &&
+        parseInt(throughMatch[1]) <= 0
+    ) {
+
+        alert("не коректний ввід даних");
+
+        return;
+    }
+}
+
+// заборона типу:
+// "6 годин"
+// "лекція 6 днів"
+
+const invalidWithoutThrough =
+    new RegExp(`\\b\\d+\\s+${validTimeUnits}`);
+
+if(
+    invalidWithoutThrough.test(text)
+    &&
+    !text.includes("через")
+) {
+
+    alert("не коректний ввід даних");
 
     return;
 }
 
-// Забороняємо конструкції типу:
-// "лекція 6 годин"
-// "арпопоо 5 днів"
-// якщо перед числом немає слова "через"
+// має бути або:
+// - час
+// - дата
+// - через n ...
+// - конкретна дата
 
-const invalidTimeWithoutThrough =
-     /(^|\s)(?!через\s)\S+\s+\d+\s+(хв|хвилина|хвилини|хвилин|год|година|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/;
+const hasTime =
+    /\b\d{1,2}:\d{2}\b/.test(text);
 
- if(
-     invalidTimeWithoutThrough.test(text)
-     &&
-     !/через\s+\d+\s+(хв|хвилина|хвилини|хвилин|год|година|години|годин|день|дні|днів|тиждень|тижні|тижнів|місяць|місяці|місяців|рік|роки|років)/.test(text)
- ) {
+const hasRelativeTime =
+    throughPattern.test(text);
 
-     alert("не коректний ввід даних");
+const hasDateWord =
+    new RegExp(validDateWords).test(text);
 
-     return;
- }
+const hasFullDate =
+    /\b\d{1,2}\s+(січня|лютого|березня|квітня|травня|червня|липня|серпня|вересня|жовтня|листопада|грудня)(\s+\d{4}\s+року)?\b/.test(text);
 
+// якщо просто "лекція"
+
+if(
+    !hasTime
+    &&
+    !hasRelativeTime
+    &&
+    !hasDateWord
+    &&
+    !hasFullDate
+) {
+
+    alert("не коректний ввід даних");
+
+    return;
+}
     await fetch(API, {
 
         method: "POST",
